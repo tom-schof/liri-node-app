@@ -1,74 +1,110 @@
 require("dotenv").config();
-
+var fs = require("fs");
+var inquirer = require("inquirer");
 var request = require("request");
 var moment = require('moment');
 var Spotify = require('node-spotify-api');
 var bandsintown = require('bandsintown')("codingbootcamp");
+
 var keys = require("./keys.js");
 var spotify = new Spotify(keys.spotify);
 
 moment().format();
 
+inquirer.prompt([{
+  type: "list",
+  name: "commands",
+  message: "Please select a command",
+  choices: ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"]
+}, ]).then(function (data) {
+
+  if (data.commands === "concert-this") {
+    inquirer.prompt([{
+      type: "input",
+      name: "artist-name",
+      message: "Please enter the artist/band name: "
+    }, ]).then(function (concertData) {
+
+      bandsintown
+        .getArtist(concertData.artist-name)
+        .then(function (events) {
+          console.log(events);
+          // return array of events
+        });
 
 
- 
- 
-spotify.search({ type: 'track', query: 'All the Small Things' }, function(err, data) {
-  if (err) {
-    return console.log('Error occurred: ' + err);
+    })
+
+  } else if (data.commands === "spotify-this-song") {
+    inquirer.prompt([{
+      type: "input",
+      name: "spotify-song",
+      message: "Please enter the song name: "
+    }, ]).then(function (spotifyData) {
+      spotify.search({
+        type: 'track',
+        query: spotifyData.name
+      }, function (err, data) {
+        if (err) {
+          return console.log('Error occurred: ' + err);
+        }
+
+        console.log(data);
+      });
+
+    })
+
+  } else if (data.commands === "movie-this") {
+    inquirer.prompt([{
+      type: "input",
+      name: "movie-name",
+      message: "Please enter the movie name: "
+    }, ]).then(function (movieData) {
+
+      var nodeArgs = movieData.name;
+      var movieName = "";
+
+      for (var i = 2; i < nodeArgs.length; i++) {
+        if (i > 2 && i < nodeArgs.length) {
+          movieName = movieName + "+" + nodeArgs[i];
+        } else {
+          movieName += nodeArgs[i];
+        }
+      }
+      var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
+      console.log(queryUrl);
+
+      request(queryUrl, function (error, response, body) {
+
+        if (!error && response.statusCode === 200) {
+          console.log("Release Year: " + JSON.parse(body).Year);
+        }
+      });
+
+
+    })
+
+  } else if (data.commands === "do-what-it-says") {
+    fs.readFile("./random.txt", "utf8", function (error, dataFS) {
+
+      if (error) {
+        return console.log(error);
+      }
+      spotify.search({
+        type: 'track',
+        query: dataFS
+      }, function (err, dataSpot) {
+        if (err) {
+          return console.log('Error occurred: ' + err);
+        }
+
+        console.log(dataSpot);
+      });
+
+    });
+
+  } else {
+    console.log("What are you doing?");
   }
- 
-console.log(data); 
+
 });
-
-
-
-
-var nodeArgs = process.argv;
-
-// Create an empty variable for holding the movie name
-var movieName = "";
-
-// Loop through all the words in the node argument
-// And do a little for-loop magic to handle the inclusion of "+"s
-for (var i = 2; i < nodeArgs.length; i++) {
-
-  if (i > 2 && i < nodeArgs.length) {
-
-    movieName = movieName + "+" + nodeArgs[i];
-
-  }
-
-  else {
-
-    movieName += nodeArgs[i];
-
-  }
-}
-
-// Then run a request to the OMDB API with the movie specified
-var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
-
-// This line is just to help us debug against the actual URL.
-console.log(queryUrl);
-
-request(queryUrl, function(error, response, body) {
-
-  // If the request is successful
-  if (!error && response.statusCode === 200) {
-
-    // Parse the body of the site and recover just the imdbRating
-    // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
-    console.log("Release Year: " + JSON.parse(body).Year);
-  }
-});
-
-
-
- 
-bandsintown
-  .getArtist('Skrillex')
-  .then(function(events) {
-      console.log(events);
-    // return array of events
-  });
