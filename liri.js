@@ -21,14 +21,22 @@ inquirer.prompt([{
   if (data.commands === "concert-this") {
     inquirer.prompt([{
       type: "input",
-      name: "artist-name",
+      name: "artistName",
       message: "Please enter the artist/band name: "
     }, ]).then(function (concertData) {
 
       bandsintown
-        .getArtist(concertData.artist-name)
+        .getArtistEventList(concertData.artistName)
         .then(function (events) {
-          console.log(events);
+          console.log("\n");
+
+          for (var i = 0; i < events.length; i++) {
+            console.log(events[i].title);
+            console.log(events[i].formatted_datetime);
+            console.log(events[i].formatted_location + "\n");
+
+          }
+
           // return array of events
         });
 
@@ -38,18 +46,29 @@ inquirer.prompt([{
   } else if (data.commands === "spotify-this-song") {
     inquirer.prompt([{
       type: "input",
-      name: "spotify-song",
+      name: "spotifySong",
       message: "Please enter the song name: "
     }, ]).then(function (spotifyData) {
       spotify.search({
         type: 'track',
-        query: spotifyData.name
+        query: spotifyData.spotifySong
       }, function (err, data) {
         if (err) {
           return console.log('Error occurred: ' + err);
         }
+        var songs = data.tracks.items;
+        // console.log(data.tracks);
+        console.log("\n");
+        for (var i = 0; i < 3; i++) {
 
-        console.log(data);
+
+          console.log(songs[i].artists[0].name + " - " + songs[i].name );
+
+
+          // console.log(songs[i].name);
+
+          // console.log(songs[i].preview_url);
+        }
       });
 
     })
@@ -57,20 +76,13 @@ inquirer.prompt([{
   } else if (data.commands === "movie-this") {
     inquirer.prompt([{
       type: "input",
-      name: "movie-name",
+      name: "movie",
       message: "Please enter the movie name: "
     }, ]).then(function (movieData) {
 
-      var nodeArgs = movieData.name;
-      var movieName = "";
 
-      for (var i = 2; i < nodeArgs.length; i++) {
-        if (i > 2 && i < nodeArgs.length) {
-          movieName = movieName + "+" + nodeArgs[i];
-        } else {
-          movieName += nodeArgs[i];
-        }
-      }
+      var movieName = movieData.movie.replace(" ", "+");
+
       var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
       console.log(queryUrl);
 
@@ -103,8 +115,6 @@ inquirer.prompt([{
 
     });
 
-  } else {
-    console.log("What are you doing?");
   }
 
 });
