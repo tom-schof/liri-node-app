@@ -57,13 +57,12 @@ inquirer.prompt([{
           return console.log('Error occurred: ' + err);
         }
         var songs = data.tracks.items;
-        console.log(data.tracks.items[0].album.preview_url);
+        // console.log(data.tracks.items[0].preview_url);
         console.log("\n");
         for (var i = 0; i < 3; i++) {
 
 
-          // console.log(songs[i].artists[0].name + " - " + songs[i].name + " - " + songs[i].album.name);
-          // console.log(songs.preview_url);
+          console.log(songs[i].artists[0].name + " - " + songs[i].name + " - " + songs[i].album.name + " - " + songs[i].preview_url + "\n \n \n" );
         }
       });
 
@@ -80,12 +79,18 @@ inquirer.prompt([{
       var movieName = movieData.movie.replace(" ", "+");
 
       var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
-      console.log(queryUrl);
+      // console.log(queryUrl);
 
       request(queryUrl, function (error, response, body) {
 
         if (!error && response.statusCode === 200) {
+          console.log("Title: " + JSON.parse(body).Title);
           console.log("Release Year: " + JSON.parse(body).Year);
+          console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+          console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value);
+          console.log("Country: " + JSON.parse(body).Country);
+          console.log("Plot: " + JSON.parse(body).Plot);
+          console.log("Actors: " + JSON.parse(body).Actors);
         }
       });
 
