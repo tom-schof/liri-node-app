@@ -57,17 +57,13 @@ inquirer.prompt([{
           return console.log('Error occurred: ' + err);
         }
         var songs = data.tracks.items;
-        // console.log(data.tracks);
+        console.log(data.tracks.items[0].album.preview_url);
         console.log("\n");
         for (var i = 0; i < 3; i++) {
 
 
-          console.log(songs[i].artists[0].name + " - " + songs[i].name );
-
-
-          // console.log(songs[i].name);
-
-          // console.log(songs[i].preview_url);
+          // console.log(songs[i].artists[0].name + " - " + songs[i].name + " - " + songs[i].album.name);
+          // console.log(songs.preview_url);
         }
       });
 
